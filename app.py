@@ -47,7 +47,7 @@ else:
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
     if request.method == 'POST':
-    # 2. 讀取學生的問題###^#@#Q%#@
+        # 2. 讀取學生的問題###^#@#Q%#@
         question = request.form.get('question', '').strip()
         # 3. 查詢題庫的對應答案
         answer = zh_ko_dict.get(question, "抱歉，我目前沒有這個詞的韓文對應。")
