@@ -33,8 +33,6 @@ stock_no = input("請輸入股票代號（例如 2330）：")
 # API URL
 url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo={stock_no}"
 
-
-
 # 發送請求
 res = requests.get(url) #原始
 data = res.json() #解析後的資料
@@ -49,28 +47,14 @@ else:
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
     if request.method == 'POST':
-        # 2. 讀取學生的問題###^#@#Q%#@
-        question = request.form.get('question', '').strip()
+    # 2. 讀取學生的問題###^#@#Q%#@
+    question = request.form.get('question', '').strip()
         # 3. 查詢題庫的對應答案
         answer = zh_ko_dict.get(question, "抱歉，我目前沒有這個詞的韓文對應。")
         # 4. 回傳答案給學生
         return render_template('ask.html', question=question, answer=answer)
     # GET 時給空白欄位
     return render_template('ask.html', question="", answer="")
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 @app.route('/gpt', methods=['GET', 'POST'])
