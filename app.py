@@ -44,6 +44,7 @@ if data["stat"] == "OK":
     print("前一天收盤價：",data["data"][-1][6]) #return render_template('stock.html', question=question, answer=answer)
 else:
     print("查無資料，請確認股票代號或日期") #return render_template('stock.html', question=question, answer=answer)
+
 @app.route('/ask', methods=['GET', 'POST'])
 def ask():
     if request.method == 'POST':
