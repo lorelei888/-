@@ -1,42 +1,19 @@
-from flask import Flask, render_template, request
 import requests
+from datetime import datetime
 
-app = Flask(__name__)
+stock_no = input("請輸入股票代號（例如 2330）: ")
+date = datetime.now().strftime("%Y%m01")  # 當月第一天
 
-@app.route("/", methods=["GET", "POST"])
-def stock():
-    result = None
+url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={stock_no}"
 
-    if request.method == "POST":
-        stock_no = request.form.get("stock_no")
+try:
+    res = requests.get(url, timeout=10)
+    data = res.json()
+except Exception as e:
+    print("請求失敗：", e)
+    exit()
 
-        url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&stockNo={stock_no}"
-
-        try:
-            res = requests.get(url, timeout=10)
-            res.raise_for_status()
-            data = res.json()
-
-        except requests.exceptions.RequestException as e:
-            result = f"連線或請求錯誤：{e}"
-            return render_template("stock.html", result=result)
-
-        except ValueError:
-            result = "回傳資料格式錯誤（不是有效的 JSON）"
-            return render_template("stock.html", result=result)
-
-        # 判斷資料
-        if data.get("stat") == "OK" and data.get("data"):
-            try:
-                latest_day = data["data"][-1]
-                close_price = latest_day[6]
-                result = f"股票 {stock_no} 最新收盤價：{close_price}"
-            except (IndexError, TypeError):
-                result = "資料格式異常，無法解析收盤價"
-        else:
-            result = "查無資料，請確認股票代號或是否有交易資料"
-
-    return render_template("stock.html", result=result)
-
-if __name__ == "__main__":
-    app.run(debug=True)
+if data.get("stat") == "OK" and data.get("data"):
+    print("最新收盤價：", data["data"][-1][6])
+else:
+    print("查無資料，請確認股票代號")
