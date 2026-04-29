@@ -19,8 +19,6 @@ zh_ko_dict = {
 }
 
 
-
-
 # homepage process
 @app.route('/')
 def index():
