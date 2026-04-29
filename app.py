@@ -1,19 +1,29 @@
+from flask import Flask, request, jsonify
 import requests
 from datetime import datetime
 
-stock_no = input("請輸入股票代號（例如 2330）: ")
-date = datetime.now().strftime("%Y%m01")  # 當月第一天
+app = Flask(__name__)
 
-url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={stock_no}"
+@app.route("/stock")
+def get_stock():
+    stock_no = request.args.get("stockNo", "2330")  # 從 URL 參數取得
+    date = datetime.now().strftime("%Y%m01")
 
-try:
-    res = requests.get(url, timeout=10)
-    data = res.json()
-except Exception as e:
-    print("請求失敗：", e)
-    exit()
+    url = f"https://www.twse.com.tw/exchangeReport/STOCK_DAY?response=json&date={date}&stockNo={stock_no}"
 
-if data.get("stat") == "OK" and data.get("data"):
-    print("最新收盤價：", data["data"][-1][6])
-else:
-    print("查無資料，請確認股票代號")
+    try:
+        res = requests.get(url, timeout=10)
+        data = res.json()
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+    if data.get("stat") == "OK" and data.get("data"):
+        return jsonify({
+            "stock": stock_no,
+            "close": data["data"][-1][6]
+        })
+    else:
+        return jsonify({"error": "查無資料"}), 404
+
+if __name__ == "__main__":
+    app.run()
